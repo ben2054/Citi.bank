@@ -3,398 +3,447 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#071a33">
-<title>Northwind Bank</title>
+<title>Northwind Bank — demo</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f2f5fa;color:#17243a}
-header{background:#071a33;color:white;padding:22px 16px}
-.header-inner{max-width:900px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-size:22px;font-weight:bold}
-.brand span{color:#62b5ff}
-main{max-width:900px;margin:22px auto;padding:0 14px 40px}
-.card{background:white;padding:20px;border-radius:15px;margin-bottom:16px;box-shadow:0 3px 15px #10233a0d}
-h2{margin-top:0;font-size:20px}
-input,select,button{width:100%;padding:13px;margin:7px 0;border-radius:9px;font-size:15px}
-input,select{border:1px solid #ccd5e2;background:white}
-button{border:0;background:#0759b5;color:white;font-weight:bold;cursor:pointer}
-button.secondary{background:#e7eef8;color:#12345b}
-button.danger{background:#a52828}
-.tabs{display:flex;gap:8px;margin-bottom:12px}
-.tabs button{flex:1}
-.hidden{display:none!important}
-.muted{color:#69778a;font-size:13px}
-.message{margin:10px 0;padding:10px;border-radius:8px;background:#edf6ff;overflow-wrap:anywhere}
-.balance{background:linear-gradient(130deg,#082348,#0759b5);color:white;padding:23px;border-radius:15px}
-.balance .amount{font-size:32px;font-weight:bold;margin:12px 0}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.stat{background:#f3f6fb;border-radius:10px;padding:13px}
-.stat strong{display:block;margin-top:7px;overflow-wrap:anywhere}
-.transaction{padding:14px 0;border-bottom:1px solid #e5eaf1;display:flex;justify-content:space-between;gap:12px}
-.transaction:last-child{border-bottom:0}
-.transaction .desc{font-weight:bold;overflow-wrap:anywhere}
-.credit{color:#14804a}.debit{color:#c23b3b}
-.small-btn{width:auto;padding:9px 12px}
-footer{text-align:center;color:#6d7888;padding:20px;font-size:12px}
-@media(min-width:650px){.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
+  :root {
+    --text: #111827; --text2: #4b5563; --text3: #9ca3af; --text4: #d1d5db;
+    --border: #e5e7eb; --muted: #f3f4f6; --surface: #ffffff;
+    --positive: #16a34a; --danger: #dc2626;
+    --c1: #2563eb; --c2: #dc2626; --c3: #16a34a; --c4: #7c3aed; --c5: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--muted); color: var(--text);
+    min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px;
+  }
+  .bank { width: 100%; max-width: 420px; }
+
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn .2s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+
+  .login-head { text-align: center; margin: 48px 0 20px; }
+  .login-logo { width: 44px; height: 44px; margin: 0 auto 12px; }
+  .bank-name { font-size: 20px; font-weight: 600; }
+  .bank-tag { font-size: 14px; color: var(--text3); margin-top: 4px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; color: var(--text2); margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+    font: inherit; background: #fff; color: var(--text); outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--text); }
+  .field input.err { border-color: var(--danger); }
+
+  .btn {
+    width: 100%; padding: 11px 16px; border: none; border-radius: 10px; cursor: pointer;
+    font-weight: 600; font-size: 15px; transition: opacity .15s ease-out;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--text); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+  .form-error { display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--danger); margin: -4px 0 12px; }
+  .form-error.show { display: flex; }
+  .form-error svg { width: 16px; height: 16px; flex: none; }
+
+  .demo-hint { margin-top: 16px; font-size: 13px; color: var(--text3); text-align: center; }
+  .demo-hint code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: var(--muted); padding: 2px 6px; border-radius: 6px; }
+
+  .app-head { display: flex; align-items: center; gap: 12px; margin: 8px 0 20px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; flex: none; }
+  .who { flex: 1; min-width: 0; }
+  .who .nm { font-size: 16px; font-weight: 600; }
+  .who .ac { font-size: 13px; color: var(--text3); font-variant-numeric: tabular-nums; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: #fff;
+    color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--text); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .bal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .bal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .bal-label { font-size: 14px; color: var(--text2); }
+  .eye-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 4px; display: flex; }
+  .eye-btn:hover { color: var(--text); }
+  .eye-btn svg { width: 18px; height: 18px; }
+  .bal-num { font-size: 36px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+  .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+  .tab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0;
+    border: none; border-radius: 6px; background: transparent; color: var(--text2);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .tab svg { width: 16px; height: 16px; }
+  .tab.active { background: var(--text); color: #fff; }
+
+  .pane-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px 12px; }
+  .sec-title { font-size: 14px; color: var(--text2); margin: 12px 0 4px; }
+
+  .tx-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex: none; }
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-name { font-size: 14px; font-weight: 600; }
+  .tx-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .tx-amt { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tx-amt.in { color: var(--positive); }
+  .tx-empty { font-size: 14px; color: var(--text3); padding: 16px 0; }
+
+  .avail { display: flex; justify-content: space-between; font-size: 13px; color: var(--text3); margin: -6px 0 16px; font-variant-numeric: tabular-nums; }
+  .amount-wrap { position: relative; }
+  .amount-wrap .cur { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 15px; }
+  .amount-wrap input { padding-left: 30px; font-size: 20px; font-variant-numeric: tabular-nums; }
+
+  .review { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+  .review-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+  .review-row .k { color: var(--text3); }
+  .review-row .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .success { text-align: center; padding: 24px 0 12px; }
+  .success .ck { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--positive); }
+  .success .t1 { font-size: 17px; font-weight: 600; }
+  .success .t2 { font-size: 14px; color: var(--text3); margin: 6px 0 20px; }
+
+  .foot { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text4); }
 </style>
 </head>
 <body>
-<header>
-  <div class="header-inner">
-    <div class="brand">NORTHWIND <span>BANK</span></div>
-    <button id="logoutBtn" class="secondary small-btn hidden" onclick="logout()">Sign out</button>
+<div class="bank">
+
+  <!-- LOGIN -->
+  <div class="view active" id="v-login">
+    <div class="login-head">
+      <svg class="login-logo" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 3.8H7C5.78497 3.8 4.8 4.78497 4.8 6V15.7647C4.8 16.574 5.24438 17.318 5.95698 17.7017L10.957 20.394C11.6081 20.7446 12.3919 20.7446 13.043 20.394L18.043 17.7017C18.7556 17.318 19.2 16.574 19.2 15.7647V6C19.2 4.78497 18.215 3.8 17 3.8ZM7 2C4.79086 2 3 3.79086 3 6V15.7647C3 17.2362 3.80796 18.5889 5.1036 19.2866L10.1036 21.9789C11.2875 22.6164 12.7125 22.6164 13.8964 21.9789L18.8964 19.2866C20.192 18.5889 21 17.2362 21 15.7647V6C21 3.79086 19.2091 2 17 2H7Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16.7248 8.63051C17.0763 8.98198 17.0763 9.55183 16.7248 9.9033L11.7627 14.8654C11.4113 15.2169 10.8414 15.2169 10.4899 14.8654L7.81839 12.1939C7.46692 11.8424 7.46691 11.2726 7.81839 10.9211C8.16986 10.5696 8.7397 10.5696 9.09118 10.9211L11.1263 12.9562L15.4521 8.63051C15.8035 8.27904 16.3734 8.27904 16.7248 8.63051Z" fill="currentColor"/></svg>
+      <div class="bank-name">Northwind Bank</div>
+      <div class="bank-tag">Sign in to your account</div>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label for="lg-user">Username</label>
+        <input id="lg-user" type="text" autocomplete="off" placeholder="e.g. alex">
+      </div>
+      <div class="field">
+        <label for="lg-pin">PIN</label>
+        <input id="lg-pin" type="password" placeholder="4-digit PIN" maxlength="4" inputmode="numeric">
+      </div>
+      <div class="form-error" id="lg-err">
+        <svg viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.5108 3.5501C13.3946 1.61676 10.6041 1.61676 9.48786 3.5501L1.69363 17.0501C0.577423 18.9834 1.97269 21.4001 4.20511 21.4001H19.7936C22.026 21.4001 23.4212 18.9834 22.305 17.0501L14.5108 3.5501ZM11.0467 4.4501C11.4701 3.71676 12.5286 3.71676 12.952 4.4501L20.7462 17.9501C21.1696 18.6834 20.6403 19.6001 19.7936 19.6001H4.20511C3.35833 19.6001 2.82909 18.6834 3.25248 17.9501L11.0467 4.4501Z" fill="currentColor"/></svg>
+        <span id="lg-err-msg">Incorrect username or PIN.</span>
+      </div>
+      <button class="btn btn-primary" id="lg-btn">Sign in</button>
+      <div class="demo-hint">Demo accounts — <code>alex / 1234</code> · <code>sam / 5678</code></div>
+    </div>
   </div>
-</header>
 
-<main>
-  <section id="authSection" class="card">
-    <h2 id="authHeading">Welcome back</h2>
-    <p class="muted">Sign in or create a local demo account.</p>
+  <!-- APP -->
+  <div class="view" id="v-app">
+    <div class="app-head">
+      <div class="avatar" id="me-avatar">A</div>
+      <div class="who">
+        <div class="nm" id="me-name">—</div>
+        <div class="ac" id="me-acct">—</div>
+      </div>
+      <button class="icon-btn" id="btn-logout" title="Log out">
+        <svg viewBox="0 0 24 24" fill="none" style="transform: rotate(180deg)"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.10001 11.98C2.10001 11.7413 2.19483 11.5123 2.36361 11.3436L6.84353 6.86364C7.195 6.51217 7.76485 6.51217 8.11632 6.86364C8.46779 7.21511 8.46779 7.78496 8.11632 8.13643L5.1728 11.08H16.5C17.6598 11.08 18.6 10.1398 18.6 8.97995V6.44149C18.6 5.94444 19.0029 5.54149 19.5 5.54149C19.9971 5.54149 20.4 5.94444 20.4 6.44149V8.97995C20.4 11.1339 18.6539 12.88 16.5 12.88H5.1728L8.11632 15.8235C8.46779 16.1749 8.46779 16.7448 8.11632 17.0963C7.76485 17.4477 7.195 17.4477 6.84353 17.0963L2.36361 12.6164C2.19483 12.4476 2.10001 12.2186 2.10001 11.98Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+
+    <div class="bal-card">
+      <div class="bal-top">
+        <span class="bal-label">Total balance</span>
+        <button class="eye-btn" id="btn-eye" title="Show / hide balance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+        </button>
+      </div>
+      <div class="bal-num" id="bal-num">$0.00</div>
+    </div>
+
     <div class="tabs">
-      <button class="secondary" onclick="showAuth('login')">Sign in</button>
-      <button class="secondary" onclick="showAuth('register')">Create account</button>
+      <button class="tab active" id="tab-ov">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M11.8999 6.79965C12.397 6.79965 12.7997 7.20235 12.7997 7.69941V11.7266L14.7359 13.6629C15.0873 14.0143 15.0879 14.584 14.7366 14.9355C14.3852 15.287 13.8148 15.287 13.4633 14.9355L11.2632 12.7355C11.0947 12.5668 11.0002 12.338 11.0001 12.0995V7.69941C11.0001 7.20238 11.4029 6.7997 11.8999 6.79965Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.89893C17.4677 1.89893 21.9001 6.33147 21.9002 11.7991C21.9002 17.2669 17.4678 21.6993 12 21.6993C6.53228 21.6993 2.09985 17.2669 2.09985 11.7991C2.09998 6.33147 6.53236 1.89893 12 1.89893ZM20.1 11.7998C20.1 7.32616 16.4737 3.69984 12 3.69984C7.5264 3.69984 3.90008 7.32616 3.90008 11.7998C3.90032 16.2732 7.52655 19.8998 12 19.8998C16.4735 19.8998 20.0998 16.2732 20.1 11.7998Z" fill="currentColor"/></svg>
+        Activity
+      </button>
+      <button class="tab" id="tab-tr">
+        <svg viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.09998 11.9799C2.09998 11.7412 2.1948 11.5123 2.36358 11.3435L6.86358 6.84351C7.21505 6.49204 7.7849 6.49204 8.13637 6.84351C8.48784 7.19498 8.48784 7.76483 8.13637 8.1163L5.17277 11.0799H21C21.497 11.0799 21.9 11.4828 21.9 11.9799C21.9 12.477 21.497 12.8799 21 12.8799H5.17277L8.13637 15.8435C8.48784 16.195 8.48784 16.7648 8.13637 17.1163C7.7849 17.4678 7.21505 17.4678 6.86358 17.1163L2.36358 12.6163C2.1948 12.4475 2.09998 12.2186 2.09998 11.9799Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.8636 6.80505C16.215 6.45358 16.7849 6.45357 17.1364 6.80505L21.6748 11.3435C21.8436 11.5123 21.9384 11.7412 21.9384 11.9799C21.9384 12.2186 21.8436 12.4475 21.6748 12.6163L17.1364 17.1548C16.7849 17.5062 16.215 17.5062 15.8636 17.1548C15.5121 16.8033 15.5121 16.2334 15.8636 15.882L19.7656 11.9799L15.8636 8.07784C15.5121 7.72637 15.5121 7.15652 15.8636 6.80505Z" fill="currentColor"/></svg>
+        Transfer
+      </button>
+      <button class="tab" id="tab-add">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4.8C12.4971 4.8 12.9 5.20294 12.9 5.7V11.1H18.3C18.7971 11.1 19.2 11.5029 19.2 12C19.2 12.4971 18.7971 12.9 18.3 12.9H12.9V18.3C12.9 18.7971 12.4971 19.2 12 19.2C11.5029 19.2 11.1 18.7971 11.1 18.3V12.9H5.7C5.20294 12.9 4.8 12.4971 4.8 12C4.8 11.5029 5.20294 11.1 5.7 11.1H11.1V5.7C11.1 5.20294 11.5029 4.8 12 4.8Z" fill="currentColor"/></svg>
+        Add money
+      </button>
     </div>
-    <form id="authForm">
-      <div id="nameWrap" class="hidden">
-        <label for="fullName">Full name</label>
-        <input id="fullName" autocomplete="name" placeholder="Enter your full name">
+
+    <!-- Activity -->
+    <div class="pane-card" id="pane-ov">
+      <h3 class="sec-title">Recent activity</h3>
+      <div id="tx-list"></div>
+    </div>
+
+    <!-- Transfer -->
+    <div class="pane-card" id="pane-tr" style="display:none">
+      <div id="tr-form">
+        <div class="field" style="margin-top:12px">
+          <label for="tr-to">Recipient</label>
+          <select id="tr-to"></select>
+        </div>
+        <div class="field">
+          <label for="tr-amt">Amount</label>
+          <div class="amount-wrap">
+            <span class="cur">$</span>
+            <input id="tr-amt" type="number" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+        <div class="field">
+          <label for="tr-note">Note <span style="color:var(--text4)">(optional)</span></label>
+          <input id="tr-note" type="text" maxlength="40" placeholder="What's it for?">
+        </div>
+        <div class="avail"><span>Available balance</span><span id="tr-avail">—</span></div>
+        <div class="form-error" id="tr-err">
+          <svg viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.5108 3.5501C13.3946 1.61676 10.6041 1.61676 9.48786 3.5501L1.69363 17.0501C0.577423 18.9834 1.97269 21.4001 4.20511 21.4001H19.7936C22.026 21.4001 23.4212 18.9834 22.305 17.0501L14.5108 3.5501ZM11.0467 4.4501C11.4701 3.71676 12.5286 3.71676 12.952 4.4501L20.7462 17.9501C21.1696 18.6834 20.6403 19.6001 19.7936 19.6001H4.20511C3.35833 19.6001 2.82909 18.6834 3.25248 17.9501L11.0467 4.4501Z" fill="currentColor"/></svg>
+          <span id="tr-err-msg">—</span>
+        </div>
+        <button class="btn btn-primary" id="tr-next">Review transfer</button>
       </div>
-      <label for="email">Email address</label>
-      <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
-      <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters">
-      <button id="authSubmit" type="submit">Sign in</button>
-    </form>
-    <div id="authMessage" class="message hidden"></div>
-    <p class="muted">Prototype only. Do not enter a real banking password.</p>
-  </section>
 
-  <section id="bankSection" class="hidden">
-    <div class="card">
-      <h2 id="welcomeName">Welcome</h2>
-      <p class="muted" id="customerEmail"></p>
-      <div class="balance">
-        <div>Displayed demo balance</div>
-        <div class="amount" id="balance">₦0.00</div>
-        <div class="muted" style="color:#d6e9ff">Simulated account · Not real funds</div>
+      <div id="tr-confirm" style="display:none">
+        <h3 class="sec-title">Review transfer</h3>
+        <div class="review">
+          <div class="review-row"><span class="k">To</span><span class="v" id="cf-to">—</span></div>
+          <div class="review-row"><span class="k">Amount</span><span class="v" id="cf-amt">—</span></div>
+          <div class="review-row" id="cf-note-row" style="display:none"><span class="k">Note</span><span class="v" id="cf-note">—</span></div>
+          <div class="review-row"><span class="k">Fee</span><span class="v">$0.00</span></div>
+        </div>
+        <button class="btn btn-primary" id="cf-send" style="margin-bottom:8px">Confirm &amp; send</button>
+        <button class="btn btn-ghost" id="cf-back">Back</button>
       </div>
-      <div class="stats" style="margin-top:14px">
-        <div class="stat"><span class="muted">Account number</span><strong id="accountNumber">—</strong></div>
-        <div class="stat"><span class="muted">Transactions</span><strong id="transactionCount">0</strong></div>
+
+      <div id="tr-done" style="display:none">
+        <div class="success">
+          <svg class="ck" viewBox="0 0 24 24" fill="none"><path d="M19.3027 5.9053C19.6542 5.55397 20.2247 5.55388 20.5761 5.9053C20.9273 6.25675 20.9273 6.82734 20.5761 7.17874L9.65911 18.0948C9.30773 18.4461 8.73814 18.446 8.38665 18.0948L3.42376 13.1328C3.0726 12.7814 3.07263 12.2118 3.42376 11.8604C3.77524 11.509 4.34575 11.5089 4.6972 11.8604L9.02239 16.1856L19.3027 5.9053Z" fill="currentColor"/></svg>
+          <div class="t1">Transfer sent</div>
+          <div class="t2" id="done-msg">—</div>
+          <button class="btn btn-primary" id="done-btn">Done</button>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Transaction history</h2>
-      <p class="muted">Transactions entered by the demo administrator appear here.</p>
-      <div id="historyList"></div>
-    </div>
-    <div id="userMessage" class="message hidden"></div>
-  </section>
-
-  <section id="adminSection" class="hidden">
-    <div class="card">
-      <h2>Administrator</h2>
-      <p class="muted">Add a simulated transaction to a registered demo account.</p>
-      <form id="adminLoginForm">
-        <label for="adminPassword">Admin access password</label>
-        <input id="adminPassword" type="password" placeholder="Enter admin password" required>
-        <button type="submit">Open admin tools</button>
-      </form>
-      <div id="adminMessage" class="message hidden"></div>
-    </div>
-
-    <div id="adminTools" class="card hidden">
-      <h2>Enter transaction history</h2>
-      <form id="transactionForm">
-        <label for="targetEmail">Customer email</label>
-        <input id="targetEmail" type="email" required placeholder="customer@example.com">
-        <label for="transactionType">Transaction type</label>
-        <select id="transactionType">
-          <option value="credit">Credit (display only)</option>
-          <option value="debit">Debit (display only)</option>
-        </select>
-        <label for="transactionAmount">Amount (₦)</label>
-        <input id="transactionAmount" type="number" min="0.01" step="0.01" required placeholder="0.00">
-        <label for="transactionDescription">Description</label>
-        <input id="transactionDescription" required maxlength="100" placeholder="e.g. Sample payment">
-        <label for="transactionDate">Transaction date</label>
-        <input id="transactionDate" type="date" required>
-        <button type="submit">Save transaction</button>
-      </form>
-      <p class="muted">Only use fictional transactions. This page does not process payments.</p>
+    <!-- Add money -->
+    <div class="pane-card" id="pane-add" style="display:none">
+      <div id="add-form">
+        <div class="field" style="margin-top:12px">
+          <label for="add-src">From</label>
+          <select id="add-src">
+            <option>External debit card •••• 4242</option>
+            <option>External bank •••• 8801</option>
+            <option>Cash deposit</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="add-amt">Amount</label>
+          <div class="amount-wrap">
+            <span class="cur">$</span>
+            <input id="add-amt" type="number" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+        <div class="form-error" id="add-err">
+          <svg viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.5108 3.5501C13.3946 1.61676 10.6041 1.61676 9.48786 3.5501L1.69363 17.0501C0.577423 18.9834 1.97269 21.4001 4.20511 21.4001H19.7936C22.026 21.4001 23.4212 18.9834 22.305 17.0501L14.5108 3.5501ZM11.0467 4.4501C11.4701 3.71676 12.5286 3.71676 12.952 4.4501L20.7462 17.9501C21.1696 18.6834 20.6403 19.6001 19.7936 19.6001H4.20511C3.35833 19.6001 2.82909 18.6834 3.25248 17.9501L11.0467 4.4501Z" fill="currentColor"/></svg>
+          <span id="add-err-msg">—</span>
+        </div>
+        <button class="btn btn-primary" id="add-btn">Add money</button>
+      </div>
+      <div id="add-done" style="display:none">
+        <div class="success">
+          <svg class="ck" viewBox="0 0 24 24" fill="none"><path d="M19.3027 5.9053C19.6542 5.55397 20.2247 5.55388 20.5761 5.9053C20.9273 6.25675 20.9273 6.82734 20.5761 7.17874L9.65911 18.0948C9.30773 18.4461 8.73814 18.446 8.38665 18.0948L3.42376 13.1328C3.0726 12.7814 3.07263 12.2118 3.42376 11.8604C3.77524 11.509 4.34575 11.5089 4.6972 11.8604L9.02239 16.1856L19.3027 5.9053Z" fill="currentColor"/></svg>
+          <div class="t1">Money added</div>
+          <div class="t2" id="add-done-msg">—</div>
+          <button class="btn btn-primary" id="add-done-btn">Done</button>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>Registered local demo accounts</h2>
-      <div id="accountList"></div>
-    </div>
-  </section>
-</main>
-
-<footer>Northwind Bank · Demonstration website only · No real banking services</footer>
+    <div class="foot">Demo bank — all data stays in this browser tab.</div>
+  </div>
+</div>
 
 <script>
-/*
- DEMO ONLY:
- Data is stored in this browser's localStorage.
- This is not secure authentication or a production banking system.
- Change the demo admin password before testing.
-*/
-const ADMIN_PASSWORD = "ChangeThisAdmin123!";
-const USERS_KEY = "northwind_demo_users_v2";
-const SESSION_KEY = "northwind_demo_session_v2";
+(function () {
+  var fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+  var AV = ['var(--c1)', 'var(--c4)', 'var(--c2)', 'var(--c5)', 'var(--c3)'];
 
-let authMode = "login";
-let currentUserEmail = "";
-let adminOpen = false;
+  var DB = {
+    alex: { pin: '1234', name: 'Alex Carter', acct: '•••• 9012', balance: 12480.50, hidden: false,
+      tx: [
+        { name: 'Payroll — Meridian Studio', amount: 3450.00, dir: 'in',  date: 'Oct 14' },
+        { name: 'Whole Foods Market',        amount: -86.32,  dir: 'out', date: 'Oct 13' },
+        { name: 'Sam Rivera',                amount: -120.00, dir: 'out', date: 'Oct 11', note: 'Dinner split' },
+        { name: 'City Power & Light',        amount: -64.10,  dir: 'out', date: 'Oct 8'  },
+        { name: 'Refund — Amazon',           amount: 42.99,   dir: 'in',  date: 'Oct 5'  }
+      ] },
+    sam: { pin: '5678', name: 'Sam Rivera', acct: '•••• 4477', balance: 8320.75, hidden: false,
+      tx: [
+        { name: 'Payroll — Brightline Co',   amount: 2980.00, dir: 'in',  date: 'Oct 14' },
+        { name: 'Alex Carter',               amount: 120.00,  dir: 'in',  date: 'Oct 11', note: 'Dinner split' },
+        { name: 'Netflix',                   amount: -15.49,  dir: 'out', date: 'Oct 9'  },
+        { name: 'Metro Transit',             amount: -40.00,  dir: 'out', date: 'Oct 7'  }
+      ] }
+  };
+  var CONTACTS = ['Maya Chen', 'Jordan Lee', 'Priya Nair', 'Tom Becker', 'Whole Foods Market'];
 
-function readUsers(){
-  try {
-    const data = JSON.parse(localStorage.getItem(USERS_KEY) || "{}");
-    return data && typeof data === "object" ? data : {};
-  } catch(e) {
-    return {};
+  var me = null, pending = null;
+
+  function $(id) { return document.getElementById(id); }
+  function initials(n) { return n.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase(); }
+  function avColor(n) { var h = 0; for (var i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 997; return AV[h % AV.length]; }
+  function today() { var d = new Date(), m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return m[d.getMonth()] + ' ' + d.getDate(); }
+
+  function show(view) {
+    var vs = document.querySelectorAll('.view');
+    for (var i = 0; i < vs.length; i++) vs[i].classList.remove('active');
+    $(view).classList.add('active');
   }
-}
-function writeUsers(users){
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-function normalizeEmail(email){
-  return email.trim().toLowerCase();
-}
-function makeAccountNumber(){
-  return String(Math.floor(1000000000 + Math.random() * 9000000000));
-}
-function money(amount){
-  return "₦" + Number(amount || 0).toLocaleString("en-NG", {
-    minimumFractionDigits:2, maximumFractionDigits:2
-  });
-}
-function escapeHTML(value){
-  return String(value ?? "").replace(/[&<>"']/g, ch => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[ch]));
-}
-function message(id, text){
-  const el = document.getElementById(id);
-  el.textContent = text;
-  el.classList.remove("hidden");
-}
-function hideMessage(id){
-  document.getElementById(id).classList.add("hidden");
-}
-function showAuth(mode){
-  authMode = mode;
-  document.getElementById("authHeading").textContent =
-    mode === "login" ? "Welcome back" : "Create your account";
-  document.getElementById("nameWrap").classList.toggle("hidden", mode !== "register");
-  document.getElementById("fullName").required = mode === "register";
-  document.getElementById("password").autocomplete =
-    mode === "login" ? "current-password" : "new-password";
-  document.getElementById("authSubmit").textContent =
-    mode === "login" ? "Sign in" : "Create account";
-  hideMessage("authMessage");
-}
-function setView(view){
-  document.getElementById("authSection").classList.toggle("hidden", view !== "auth");
-  document.getElementById("bankSection").classList.toggle("hidden", view !== "bank");
-  document.getElementById("adminSection").classList.toggle("hidden", view !== "admin");
-  document.getElementById("logoutBtn").classList.toggle("hidden", view === "auth");
-}
-document.getElementById("authForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  hideMessage("authMessage");
-  const email = normalizeEmail(document.getElementById("email").value);
-  const password = document.getElementById("password").value;
-  const users = readUsers();
 
-  if(authMode === "register"){
-    const name = document.getElementById("fullName").value.trim();
-    if(!name){
-      message("authMessage", "Please enter your name.");
-      return;
+  /* ---- login ---- */
+  function login() {
+    var u = $('lg-user').value.trim().toLowerCase(), p = $('lg-pin').value.trim();
+    $('lg-err').classList.remove('show');
+    $('lg-pin').classList.remove('err');
+    if (DB[u] && DB[u].pin === p) {
+      me = u; pending = null;
+      $('lg-user').value = ''; $('lg-pin').value = '';
+      renderApp(); show('v-app');
+    } else {
+      $('lg-err-msg').textContent = DB[u] ? 'Wrong PIN for this account.' : 'No account found with that username.';
+      $('lg-err').classList.add('show');
+      $('lg-pin').classList.add('err');
     }
-    if(users[email]){
-      message("authMessage", "An account with this email already exists on this browser.");
-      return;
-    }
-    users[email] = {
-      name:name,
-      email:email,
-      password:password,
-      accountNumber:makeAccountNumber(),
-      transactions:[],
-      createdAt:new Date().toISOString()
-    };
-    writeUsers(users);
-    loginUser(email);
-    return;
+  }
+  $('lg-btn').addEventListener('click', login);
+  $('lg-pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') login(); });
+  $('lg-user').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('lg-pin').focus(); });
+
+  /* ---- render ---- */
+  function renderApp() {
+    var u = DB[me];
+    $('me-name').textContent = u.name;
+    $('me-acct').textContent = 'Checking ' + u.acct;
+    $('me-avatar').textContent = initials(u.name);
+    $('me-avatar').style.background = 'color-mix(in srgb, ' + avColor(u.name) + ' 18%, transparent)';
+    $('me-avatar').style.color = avColor(u.name);
+    renderBalance(); renderTx();
+    $('tr-to').innerHTML = CONTACTS.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+    resetTransfer(); resetAdd();
   }
 
-  if(!users[email] || users[email].password !== password){
-    message("authMessage", "Incorrect email or password, or no account exists on this browser.");
-    return;
+  function renderBalance() {
+    var u = DB[me];
+    $('bal-num').textContent = u.hidden ? '••••••' : fmt.format(u.balance);
+    $('tr-avail').textContent = fmt.format(u.balance);
   }
-  loginUser(email);
-});
-function loginUser(email){
-  currentUserEmail = email;
-  localStorage.setItem(SESSION_KEY, email);
-  adminOpen = false;
-  document.getElementById("adminTools").classList.add("hidden");
-  renderBank();
-}
-function logout(){
-  currentUserEmail = "";
-  adminOpen = false;
-  localStorage.removeItem(SESSION_KEY);
-  document.getElementById("authForm").reset();
-  document.getElementById("adminTools").classList.add("hidden");
-  setView("auth");
-  showAuth("login");
-}
-function calculateBalance(user){
-  return (user.transactions || []).reduce((total, tx) => {
-    const amount = Number(tx.amount) || 0;
-    return total + (tx.type === "credit" ? amount : -amount);
-  }, 0);
-}
-function renderBank(){
-  const users = readUsers();
-  const user = users[currentUserEmail];
-  if(!user){
-    logout();
-    return;
-  }
-  document.getElementById("welcomeName").textContent = "Welcome, " + user.name;
-  document.getElementById("customerEmail").textContent = user.email;
-  document.getElementById("accountNumber").textContent = user.accountNumber;
-  document.getElementById("balance").textContent = money(calculateBalance(user));
-  const transactions = [...(user.transactions || [])].sort((a,b) =>
-    (b.date || "").localeCompare(a.date || "")
-  );
-  document.getElementById("transactionCount").textContent = transactions.length;
-  const list = document.getElementById("historyList");
-  if(!transactions.length){
-    list.innerHTML = '<p class="muted">No transaction history yet.</p>';
-  } else {
-    list.innerHTML = transactions.map(tx => {
-      const isCredit = tx.type === "credit";
-      return `<div class="transaction">
-        <div>
-          <div class="desc">${escapeHTML(tx.description)}</div>
-          <div class="muted">${escapeHTML(tx.date)}</div>
-        </div>
-        <div class="${isCredit ? "credit" : "debit"}" style="text-align:right;font-weight:bold">
-          ${isCredit ? "+" : "−"}${money(tx.amount)}
-          <div class="muted">${isCredit ? "Credit" : "Debit"}</div>
-        </div>
-      </div>`;
-    }).join("");
-  }
-  setView("bank");
-}
-document.getElementById("adminLoginForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  const entered = document.getElementById("adminPassword").value;
-  if(entered !== ADMIN_PASSWORD){
-    message("adminMessage", "Incorrect administrator password.");
-    return;
-  }
-  adminOpen = true;
-  document.getElementById("adminTools").classList.remove("hidden");
-  document.getElementById("transactionDate").value =
-    new Date().toISOString().slice(0,10);
-  hideMessage("adminMessage");
-  renderAccounts();
-});
-document.getElementById("transactionForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  if(!adminOpen){
-    message("adminMessage", "Open the administrator tools first.");
-    return;
-  }
-  const email = normalizeEmail(document.getElementById("targetEmail").value);
-  const amount = Number(document.getElementById("transactionAmount").value);
-  const type = document.getElementById("transactionType").value;
-  const description = document.getElementById("transactionDescription").value.trim();
-  const date = document.getElementById("transactionDate").value;
-  const users = readUsers();
 
-  if(!users[email]){
-    message("adminMessage", "No local demo account found for that email.");
-    return;
+  function renderTx() {
+    var u = DB[me], html = '';
+    u.tx.forEach(function (t) {
+      html += '<div class="tx-row">'
+        + '<div class="tx-av" style="background:color-mix(in srgb,' + avColor(t.name) + ' 18%, transparent);color:' + avColor(t.name) + '">' + initials(t.name) + '</div>'
+        + '<div class="tx-info"><div class="tx-name">' + t.name + '</div>'
+        + '<div class="tx-meta">' + t.date + (t.note ? ' · ' + t.note : '') + '</div></div>'
+        + '<div class="tx-amt ' + (t.dir === 'in' ? 'in' : '') + '">' + (t.dir === 'in' ? '+' : '−') + fmt.format(Math.abs(t.amount)).slice(1) + '</div>'
+        + '</div>';
+    });
+    $('tx-list').innerHTML = html || '<div class="tx-empty">No activity yet.</div>';
   }
-  if(!Number.isFinite(amount) || amount <= 0 || !description || !date){
-    message("adminMessage", "Enter a valid amount, description, and date.");
-    return;
+
+  /* ---- tabs ---- */
+  function switchTab(name) {
+    $('tab-ov').classList.toggle('active', name === 'ov');
+    $('tab-tr').classList.toggle('active', name === 'tr');
+    $('tab-add').classList.toggle('active', name === 'add');
+    $('pane-ov').style.display = name === 'ov' ? '' : 'none';
+    $('pane-tr').style.display = name === 'tr' ? '' : 'none';
+    $('pane-add').style.display = name === 'add' ? '' : 'none';
+    if (name === 'tr') resetTransfer();
+    if (name === 'add') resetAdd();
   }
-  users[email].transactions = users[email].transactions || [];
-  users[email].transactions.push({
-    id:Date.now().toString() + Math.random().toString(16).slice(2),
-    type:type,
-    amount:Math.round(amount * 100) / 100,
-    description:description,
-    date:date
+  $('tab-ov').addEventListener('click', function () { switchTab('ov'); });
+  $('tab-tr').addEventListener('click', function () { switchTab('tr'); });
+  $('tab-add').addEventListener('click', function () { switchTab('add'); });
+
+  /* ---- hide balance ---- */
+  $('btn-eye').addEventListener('click', function () { DB[me].hidden = !DB[me].hidden; renderBalance(); });
+
+  /* ---- transfer ---- */
+  function tErr(msg) {
+    if (!msg) { $('tr-err').classList.remove('show'); return; }
+    $('tr-err-msg').textContent = msg;
+    $('tr-err').classList.add('show');
+  }
+  function stage(id) {
+    $('tr-form').style.display = id === 'form' ? '' : 'none';
+    $('tr-confirm').style.display = id === 'confirm' ? '' : 'none';
+    $('tr-done').style.display = id === 'done' ? '' : 'none';
+  }
+  function resetTransfer() { stage('form'); tErr(''); $('tr-amt').value = ''; $('tr-note').value = ''; }
+
+  $('tr-next').addEventListener('click', function () {
+    var u = DB[me];
+    var amt = Math.round(parseFloat($('tr-amt').value) * 100) / 100;
+    if (!isFinite(amt) || amt <= 0) { tErr('Enter an amount greater than $0.00.'); return; }
+    if (amt > u.balance) { tErr('Insufficient funds — your balance is ' + fmt.format(u.balance) + '.'); return; }
+    pending = { to: $('tr-to').value, amount: amt, note: $('tr-note').value.trim() };
+    $('cf-to').textContent = pending.to;
+    $('cf-amt').textContent = fmt.format(amt);
+    if (pending.note) { $('cf-note-row').style.display = ''; $('cf-note').textContent = pending.note; }
+    else { $('cf-note-row').style.display = 'none'; }
+    tErr(''); stage('confirm');
   });
-  writeUsers(users);
-  document.getElementById("transactionForm").reset();
-  document.getElementById("transactionDate").value =
-    new Date().toISOString().slice(0,10);
-  message("adminMessage", "Transaction history saved in this browser.");
-  renderAccounts();
-  if(currentUserEmail === email) renderBank();
-});
-function renderAccounts(){
-  const users = readUsers();
-  const entries = Object.values(users);
-  const list = document.getElementById("accountList");
-  if(!entries.length){
-    list.innerHTML = '<p class="muted">No local accounts created yet.</p>';
-    return;
-  }
-  list.innerHTML = entries.map(user => `
-    <div class="transaction">
-      <div>
-        <div class="desc">${escapeHTML(user.name)}</div>
-        <div class="muted">${escapeHTML(user.email)}</div>
-        <div class="muted">Account: ${escapeHTML(user.accountNumber)}</div>
-      </div>
-      <div style="text-align:right">
-        <strong>${money(calculateBalance(user))}</strong>
-        <div class="muted">${(user.transactions || []).length} records</div>
-      </div>
-    </div>
-  `).join("");
-}
-function openAdmin(){
-  setView("admin");
-  document.getElementById("adminLoginForm").reset();
-  document.getElementById("adminTools").classList.add("hidden");
-  hideMessage("adminMessage");
-  renderAccounts();
-}
-function renderAdminShortcut(){
-  const section = document.getElementById("adminSection");
-  if(document.getElementById("adminShortcut")) return;
-  const btn = document.createElement("button");
-  btn.id = "adminShortcut";
-  btn.className = "secondary";
-  btn.textContent = "Administrator tools";
-  btn.onclick = openAdmin;
-  section.insertBefore(btn, section.firstChild);
-}
-renderAdminShortcut();
 
-const savedSession = localStorage.getItem(SESSION_KEY);
-if(savedSession && readUsers()[savedSession]){
-  loginUser(savedSession);
-} else {
-  setView("auth");
-  showAuth("login");
-}
+  $('cf-back').addEventListener('click', function () { stage('form'); });
+  $('cf-send').addEventListener('click', function () {
+    var u = DB[me];
+    u.balance = Math.round((u.balance - pending.amount) * 100) / 100;
+    u.tx.unshift({ name: pending.to, amount: -pending.amount, dir: 'out', date: today(), note: pending.note || undefined });
+    $('done-msg').textContent = fmt.format(pending.amount) + ' sent to ' + pending.to;
+    pending = null;
+    renderBalance(); renderTx();
+    stage('done');
+  });
+  $('done-btn').addEventListener('click', function () { switchTab('ov'); });
+
+  /* ---- add money ---- */
+  function aErr(msg) {
+    if (!msg) { $('add-err').classList.remove('show'); return; }
+    $('add-err-msg').textContent = msg;
+    $('add-err').classList.add('show');
+  }
+  function resetAdd() {
+    $('add-form').style.display = ''; $('add-done').style.display = 'none';
+    aErr(''); $('add-amt').value = '';
+  }
+
+  $('add-btn').addEventListener('click', function () {
+    var u = DB[me];
+    var amt = Math.round(parseFloat($('add-amt').value) * 100) / 100;
+    if (!isFinite(amt) || amt <= 0) { aErr('Enter an amount greater than $0.00.'); return; }
+    if (amt > 100000) { aErr('Maximum top-up is $100,000.00 per transaction.'); return; }
+    var src = $('add-src').value;
+    u.balance = Math.round((u.balance + amt) * 100) / 100;
+    u.tx.unshift({ name: 'Add money — ' + src, amount: amt, dir: 'in', date: today() });
+    $('add-done-msg').textContent = fmt.format(amt) + ' added from ' + src;
+    renderBalance(); renderTx();
+    $('add-form').style.display = 'none'; $('add-done').style.display = '';
+  });
+  $('add-done-btn').addEventListener('click', function () { switchTab('ov'); });
+
+  /* ---- logout ---- */
+  $('btn-logout').addEventListener('click', function () { me = null; show('v-login'); });
+})();
 </script>
 </body>
 </html>
